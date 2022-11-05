@@ -6,11 +6,11 @@
 
 * 生产者端：与具体实现在同一个包中定义的接口。
 
-![](../images/27.png)
+![](https://img.exciting.net.cn/27.png)
 
 * 消费者端：定义在外部包中的接口。
 
-![](../images/28.png)
+![](https://img.exciting.net.cn/28.png)
 
 开发人员在生产者端创建接口以及具体实现是很常见的。这种设计可能是具有 C# 或 Java 背景的开发人员的一种习惯。然而，在 Go 中，在大多数情况下，这不是我们应该做的。
 
@@ -47,7 +47,7 @@ type customersGetter interface {
 
 从包组织中，它将导致以下结果：
 
-![](../images/29.png)
+![](https://img.exciting.net.cn/29.png)
 
 有几点需要注意：
 * 由于 `customersGetter` 接口仅在 `client`包中被使用，它可以保持未导出。
