@@ -2,7 +2,7 @@
 
 在设计API时，可能会出现一个问题：如何处理可选配置？有效解决这个问题可以提高我们的API的便利性。本节将介绍一个具体的例子，并介绍处理它的不同方法。
 
-在本例中，假设我们必须设计一个公开函数以创建HTTP服务器的库。此函数将接受不同的输入：地址和端口。该功能的骨架如下：
+在本例中，假设我们必须设计一个公开函数以创建 HTTP 服务器的库。此函数将接受不同的输入：地址和端口。该功能的骨架如下：
 
 ```go
 func NewServer(addr string, port int) (*http.Server, error) {
@@ -10,7 +10,7 @@ func NewServer(addr string, port int) (*http.Server, error) {
 }
 ```
 
-我们client的库已经开始使用这个函数，每个人都很高兴。然而，在某个时候，client开始抱怨此功能有些有限，缺乏其他参数（例如，写入超时、连接上下文）。然而，我们注意到，添加新的函数参数将破坏兼容性，迫使client修改他们调用 `NewServer` 的方式。
+我们client的库已经开始使用这个函数，每个人都很高兴。然而，在某个时候，client 开始抱怨此功能有些有限，缺乏其他参数（例如，写入超时、连接上下文）。然而，我们注意到，添加新的函数参数将破坏兼容性，迫使 client 修改他们调用 `NewServer` 的方式。
 
 与此同时，我们希望通过这种方式丰富与端口管理相关的逻辑：
 
@@ -19,15 +19,13 @@ func NewServer(addr string, port int) (*http.Server, error) {
 * 如果端口等于0，则使用随机端口
 * 否则，它将使用client提供的端口
 
-![](../images/4.png)
-
-图 2.10 与端口选项相关的逻辑。
+![](https://img.exciting.net.cn/4.png)
 
 我们如何以API友好的方式实现此功能？让我们看看不同的选项。
 
 ### 2.11.1 配置用的结构体
 
-由于Go不支持函数签名中的可选参数，第一个可能的方法是使用配置结构来传达什么是强制性和可选的。例如，强制性参数可以作为函数参数存在，而可选参数可以在配置结构中处理：
+由于 Go 不支持函数签名中的可选参数，第一个可能的方法是使用配置结构来传达什么是强制性和可选的。例如，强制性参数可以作为函数参数存在，而可选参数可以在配置结构中处理：
 
 ```go
 type Config struct {
@@ -66,7 +64,7 @@ type Config struct {
 
 使用整数的指针，在语义上，我们可以区分值为零和缺失的值（零指针）。
 
-这个选项会起作用，但有几个缺点。首先，client提供整数指针并不方便。client必须创建一个变量，然后以这种方式传递指针：
+这个选项会起作用，但有几个缺点。首先，client 提供整数指针并不方便。client 必须创建一个变量，然后以这种方式传递指针：
 
 ```go
 port := 0
@@ -91,7 +89,7 @@ httplib.NewServer("localhost", httplib.Config{})
 
 最初是四人帮设计模式的一部分，构建者模式为各种对象创建问题提供了灵活的解决方案。`Config` 的构造与结构本身分离。它需要一个额外的结构（`ConfigBuilder`），该结构将接收配置和构建 `Config` 的方法。
 
-让我们看看一个具体的例子，以及它如何帮助我们设计一个友好的API来满足我们的所有要求，包括端口管理：
+让我们看看一个具体的例子，以及它如何帮助我们设计一个友好的 API 来满足我们的所有要求，包括端口管理：
 
 ```go
 type Config struct {
@@ -133,7 +131,7 @@ func NewServer(addr string, config Config) (*http.Server, error) {
 
 > **Note** 构建器模式不可能单独实现。例如，人们可能更喜欢一种方法，即定义最终端口值的逻辑在 `Port` 方法中，而不是 `Build`。然而，这些章节的范围是概述构建者模式，而不是深入研究所有不同的可能变化。
 
-然后，client将以以下方式使用我们基于构建器的API（我们假设我们已经将代码放在 `httplib` 包中）：
+然后，client将以以下方式使用我们基于构建器的 API（我们假设我们已经将代码放在 `httplib` 包中）：
 
 ```go
 builder := httplib.ConfigBuilder{}
@@ -149,9 +147,9 @@ if err != nil {
 }
 ```
 
-首先，客户端创建一个 `ConfigBuilder`，并使用它来设置可选字段，如端口。然后，它调用Build方法并检查是否有错误。如果可以，配置将传递给NewServer。
+首先，客户端创建一个 `ConfigBuilder`，并使用它来设置可选字段，如端口。然后，它调用Build方法并检查是否有错误。如果可以，配置将传递给 NewServer。
 
-这种方法使港口管理更加方便。不需要传递整数指针，因为端口方法接受整数。但是，仍然需要传递一个配置结构，如果client想要使用默认配置，该结构可能是空的：
+这种方法使港口管理更加方便。不需要传递整数指针，因为端口方法接受整数。但是，仍然需要传递一个配置结构，如果 client 想要使用默认配置，该结构可能是空的：
 
 `server, err := httplib.NewServer("localhost", nil)`
 
@@ -166,11 +164,9 @@ if err != nil {
 * 未导出的结构包含配置：`options` 。
 * 每个选项都是返回相同类型的函数：`type Option func(options *options) error`。例如， `WithPort` 接受代表端口的 `int` 参数，并返回表示如何更新 `Option` 结构的 `Option` 类型。
 
-![](../images/5.png)
+![](https://img.exciting.net.cn/5.png)
 
-图 2.11 `WithPort` 选项更新最终的 `options` 结构体。
-
-以下是 `options` 结构、`Option` 类型和 `WithPort`选项的Go实现。
+以下是 `options` 结构、`Option` 类型和 `WithPort`选项的 Go 实现。
 
 ```go
 type options struct {
@@ -233,10 +229,10 @@ server, err := httplib.NewServer("localhost",
                 httplib.WithTimeout(time.Second))
 ```
 
-但是，如果client需要默认配置，它不必提供任何参数，例如我们在之前的方法中看到的空结构：
+但是，如果 client 需要默认配置，它不必提供任何参数，例如我们在之前的方法中看到的空结构：
 
 `server, err := httplib.NewServer("localhost")`
 
-这种模式是功能选项模式。它提供了一种方便且API友好的处理选项的方式。虽然构建器模式可以是一个有效的选项，但它有一些小的缺点，往往使功能选项模式成为在Go中解决这个问题的惯用方式。我们还请注意，此模式用于许多不同的Go库，例如gRPC。
+这种模式是功能选项模式。它提供了一种方便且API友好的处理选项的方式。虽然构建器模式可以是一个有效的选项，但它有一些小的缺点，往往使功能选项模式成为在 Go 中解决这个问题的惯用方式。我们还请注意，此模式用于许多不同的 Go 库，例如 gRPC。
 
-下一节将深入研究一个常见的错误：Go项目组织不善。
+下一节将深入研究一个常见的错误：Go 项目组织不善。
