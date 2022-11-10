@@ -1,6 +1,6 @@
 ## 2.14 忽略软件包名称冲突
 
-当变量名与现有软件包名称碰撞阻止软件包被重用时，就会发生软件包冲突。让我们看看一个库暴露Redis客户端的具体例子：
+当变量名与现有软件包名称碰撞阻止软件包被重用时，就会发生软件包冲突。让我们看看一个库暴露 Redis 客户端的具体例子：
 
 ```go
 package redis
@@ -12,7 +12,7 @@ func NewClient() *Client { ... }
 func (c *Client) Get(key string) (string, error) { ... }
 ```
 
-现在，让我们跳到client。尽管软件包名称称为 `redis`，但它在Go中完全有效，也可以创建一个名为 `redis` 的变量：
+现在，让我们跳到 client。尽管软件包名称称为 `redis`，但它在 Go 中完全有效，也可以创建一个名为 `redis` 的变量：
 
 ```go
 redis := redis.NewClient()
@@ -28,7 +28,7 @@ redisClient := redis.NewClient()
 v, err := redisClient.Get("foo")
 ```
 
-这可能是最直截了当的方法。但是，如果出于某种原因，我们更喜欢继续命名我们的变量redis，我们包的导入做文章。
+这可能是最直截了当的方法。但是，如果出于某种原因，我们更喜欢继续命名我们的变量 redis，我们包的导入做文章。
 
 使用软件包导入，我们可以使用别名更改限定符以引用 `redis` 软件包。例如：
 
