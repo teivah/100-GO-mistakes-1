@@ -99,7 +99,7 @@ func (s *Store) storeCustomers(customers []Customer) {
 * 在第二次迭代中，`custormer` 现在引用另一个元素：`Customer 2`。我们也存储了一个 `custormer` 的指针。
 * 最后，在最后一次迭代中，`custormer` 引用了最后一个元素：`Customer 3`。同样，相同的指针存储在map中。
 
-![](../images/33.png)
+![](https://img.exciting.net.cn/33.png)
 
 在迭代结束时，我们在映射中存储了三次相同的指针。这个指针的最后一个赋值是对切片最后一个元素 `Custormer 3` 的引用：这就是为什么映射的所有元素都引用相同的 `Custormer`。
 

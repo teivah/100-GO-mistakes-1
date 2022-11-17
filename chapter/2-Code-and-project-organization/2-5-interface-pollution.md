@@ -10,7 +10,7 @@
 
 `io` 包为 `I/O` 原语提供抽象。在这些抽象中，`io.Reader` 涉及从数据源读取数据，`io.Writer` 涉及将数据写入目标，如下图所示：
 
-![](../images/26.png)
+![](https://img.exciting.net.cn/26.png)
 
 `io.Reader` 包含了一个 `Read` 方法：
 

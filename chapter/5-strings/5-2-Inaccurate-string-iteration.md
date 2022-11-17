@@ -39,7 +39,7 @@ fmt.Println(utf8.RuneCountInString(s)) // 5
 
 我们必须明白，在这个例子中，我们不会遍历每个符文；相反，我们遍历符文的每个起始索引：
 
-![](../images/35.png)
+![](https://img.exciting.net.cn/35.png)
 
 打印 `s[i]` 不会打印第 `i` 个符文； 它打印索引 `i` 处字节的 UTF-8 表示。因此，我们打印了 `hÃllo` 而不是 `hêllo`。那么如果我们想打印所有不同的符文，我们该如何解决呢？我们必须使用 `range` 运算符的值元素：
 

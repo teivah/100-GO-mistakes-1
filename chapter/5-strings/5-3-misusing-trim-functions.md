@@ -10,7 +10,7 @@ fmt.Println(strings.TrimRight("123oxo", "xo"))
 
 答案是 `123`。是你所期待的吗？如果不是，您可能会期待 `TrimSuffix` 的结果。让我们回顾一下这两个函数。
 
-![](../images/36.png)
+![](https://img.exciting.net.cn/36.png)
 
 `TrimRight` 向后迭代每个符文。如果符文是提供的集合的一部分，它将移除它。如果不是，它会停止迭代并返回剩余的字符串。这就是该函数返回 `123` 的原因。
 

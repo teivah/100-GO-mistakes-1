@@ -69,7 +69,7 @@ func Store(key, value string) error {
 
 因为 `main` 依赖 `redis` 先执行，`redis` 包的init 函数将是第一个执行，然后是 `main` 包的 init，然后是 `main` 函数本身，如下图：
 
-![](../images/25.png)
+![](https://img.exciting.net.cn/25.png)
 
 我们可以为每个包定义多个初始化函数。在这种情况下，包内的 `init` 函数的执行顺序是基于源文件的字母顺序。例如，如果一个包包含一个 `a.go` 和一个 `b.go` 文件，并且都具有一个 `init` 函数，则将首先执行 `a.go` 的 `init`函数。我们不应该依赖包中初始化函数的顺序。实际上，这可能很危险，因为可以重命名源文件，从而可能影响执行顺序。
 
