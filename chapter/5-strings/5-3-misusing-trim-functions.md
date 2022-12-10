@@ -12,7 +12,7 @@ fmt.Println(strings.TrimRight("123oxo", "xo"))
 
 ![](https://img.exciting.net.cn/36.png)
 
-`TrimRight` 向后迭代每个符文。如果符文是提供的集合的一部分，它将移除它。如果不是，它会停止迭代并返回剩余的字符串。这就是该函数返回 `123` 的原因。
+`TrimRight` 向后迭代每个字符。如果字符是提供的集合的一部分，它将移除它。如果不是，它会停止迭代并返回剩余的字符串。这就是该函数返回 `123` 的原因。
 
 另一方面，`TrimSuffix` 返回一个没有提供尾随后缀的字符串：
 
@@ -29,9 +29,9 @@ fmt.Println(strings.TrimLeft("oxo123", "ox")) // 123
 fmt.Println(strings.TrimPrefix("oxo123", "ox")) /// o123
 ```
 
-`string.TrimLeft` 删除集合中包含的所有前导符文，因此打印 `123`。此外，`TrimPrefix` 删除提供的前导前缀，因此打印 `o123`。
+`string.TrimLeft` 删除集合中包含的所有前导字符，因此打印 `123`。此外，`TrimPrefix` 删除提供的前导前缀，因此打印 `o123`。
 
-与此主题相关的最后一件事是，`Trim` 将 `TrimLeft` 和 `TrimRight` 应用于字符串。因此，它删除了集合中包含的所有前导符文和尾随符文：
+与此主题相关的最后一件事是，`Trim` 将 `TrimLeft` 和 `TrimRight` 应用于字符串。因此，它删除了集合中包含的所有前导字符和尾随字符：
 
 ```go
 fmt.Println(strings.Trim("oxo123oxo", "ox")) // 123
@@ -39,7 +39,7 @@ fmt.Println(strings.Trim("oxo123oxo", "ox")) // 123
 
 总之，我们必须明确了解 `TrimRight / TrimLeft` 与 `TrimSuffix / TrimPrefix` 两者之间的区别：
 
-* `TrimRight / TrimLeft` 移除一组中的尾随/前导符文。
+* `TrimRight / TrimLeft` 移除一组中的尾随/前导字符。
 * `TrimSuffix / TrimPrefix` 删除给定的后缀/前缀。
 
 在下一节中，我们将深入研究字符串连接。
