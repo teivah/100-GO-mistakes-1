@@ -1,8 +1,8 @@
 ## 5.5 无用的字符串转换
 
-在选择使用字符串或 `[]byte` 时，大多数程序员为了方便起见倾向于使用字符串。然而，大多数 I/O 实际上是用 `[]byte` 完成的。例如， `io.Reader`、`io.Writer` 和 `io.ReadAll` 与 `[]byte` 一起工作，而不是字符串。 因此，使用字符串意味着额外的转换，尽管 `bytes` 包包含许多与 `strings` 包相同的操作。
+在选择使用字符串或 `[]byte` 时，大多数程序员为了方便起见倾向于使用字符串。然而，大多数 I/O 实际上是用 `[]byte` 完成的。例如， `io.Reader`、`io.Writer` 和 `io.ReadAll` 都是使用 `[]byte` 类型的参数，而不是字符串类型参数。 因此，使用字符串意味着额外的转换，尽管 `bytes` 包包含许多与 `strings` 包相同的操作。
 
-让我们看一个我们不应该做的例子。我们将实现一个 `getBytes` 函数，该函数将 `io.Reader` 作为输入，从中读取，然后调用 `sanitize` 函数。清理将通过修剪所有前导和尾随空格来完成。这是 `getBytes` 的骨架：
+让我们看一个错误用例。我们将实现一个 `getBytes` 函数，该函数将 `io.Reader` 作为输入，从中读取，然后调用 `sanitize` 函数。`sanitize` 函数将清理掉字符串两端的空格。这是 `getBytes` 的骨架：
 
 ```go
 func getBytes(reader io.Reader) ([]byte, error) {
@@ -30,7 +30,7 @@ return []byte(sanitize(string(b))), nil
 
 这个实现有什么问题？我们必须付出额外的代价，将 `[]byte` 转换为字符串，然后将字符串转换为 `[]byte`。在内存方面，这些转换中的每一个都需要额外的分配。实际上，即使字符串由 `[]byte` 支持，将 `[]byte` 转换为字符串也需要字节切片的副本。这意味着新的内存分配和为所有字节创建副本。
 
-> **Note** 我们可以使用以下代码测试从 `[]byte` 创建字符串会导致副本的事实：
+> **Note** 我们可以使用以下代码测试从 `[]byte` 创建字符串会导致副本：
 
 ```go
 b := []byte{'a', 'b', 'c'}
@@ -49,7 +49,7 @@ func sanitize(b []byte) []byte {
 }
 ```
 
-`bytes` 包还有一个 `TrimSpace` 函数来修剪所有前导和尾随空格。现在，在调用方，它不需要任何额外的转换：
+`bytes` 包还有一个 `TrimSpace` 函数来裁剪两端的空格。现在，在调用方，它不需要任何额外的转换：
 
 ```go
 return sanitize(b), nil
