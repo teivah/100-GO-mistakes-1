@@ -37,7 +37,7 @@ func Foo() error {
 
 ```go
 if err != nil {
-        return err
+    return err
 }
 ```
 
@@ -49,11 +49,11 @@ if err != nil {
 
 ```go
 type BarError struct {
-        Err error
+    Err error
 }
 
 func (b BarError) Error() string {
-        return "bar failed:" + b.Err.Error()
+    return "bar failed:" + b.Err.Error()
 }
 ```
 
@@ -73,7 +73,7 @@ if err != nil {
 
 ```go
 if err != nil {
-        return fmt.Errorf("bar failed: %w", err)
+    return fmt.Errorf("bar failed: %w", err)
 }
 ```
 
@@ -95,11 +95,11 @@ if err != nil {
 
 ![](https://img.exciting.net.cn/44.png)
 
-有关问题根源的信息仍然可用。但是，调用者无法解开此错误并检查源是否为 `bar error`。因此，从某种意义上说，此选项比 `%w` 更具限制性。 但是，既然 `%w` 指令已经发布，我们应该阻止这种情况吗？ 不必要。
+有关问题根源的信息仍然可用。但是，调用者无法解开此错误并检查源是否为 `bar error`。因此，从某种意义上说，此选项比 `%w` 更具限制性。但是，既然 `%w` 指令已经发布，我们应该阻止这种情况吗？不必要。
 
 包装错误使调用者可以使用源错误。因此，这意味着引入潜在的耦合。例如，假设我们使用包装并且 `Foo` 的调用者检查源错误是否为 `bar error`。现在，如果我们想改变我们的实现并使用另一个会返回另一种错误的函数？它将破坏调用者所做的错误检查。
 
-如果我们想确保我们的客户不依赖我们考虑的东西作为实现细节，那么返回的错误不应该被包装，而是类型转换。在这种情况下，使用 `%v` 而不是 `%w` 可能是要走的路。
+如果我们想确保我们的客户不依赖我们考虑的东西作为实现细节，那么返回的错误不应该被包装，而是类型转换。在这种情况下，使用 `%v` 来取代可能使用 `%w` 的地方。
 
 因此，让我们总结一下我们处理的所有不同选项：
 

@@ -1,8 +1,8 @@
-## 7.7 不被处理的 defer 错误
+## 7.7 不处理 defer 的错误，引入的坑
 
 不处理 defer 语句中的错误是 Go 开发人员经常犯的错误。让我们了解问题是什么以及可能的解决方案是什么。
 
-在下面的示例中，我们将实现一个函数来查询数据库以获取给定客户 ID 的余额。我们将使 用 `database/sql` 和 `Query` 方法。
+在下面的示例中，我们将实现一个函数来查询数据库以获取给定客户 ID 的余额。我们将使用 `database/sql` 和 `Query` 方法。
 
 > **Note** 让我们不要过多地研究这个包是如何工作的；我们将在 *SQL 常见错误的标准库* 章节中进行处理。
 
@@ -48,10 +48,10 @@ defer func() { _ = rows.Close() }()
 
 ```go
 defer func() {
-        err := rows.Close()
-        if err != nil {
-                log.Printf("failed to close rows: %v", err)
-        }
+    err := rows.Close()
+    if err != nil {
+            log.Printf("failed to close rows: %v", err)
+    }
 }()
 ```
 
@@ -61,10 +61,10 @@ defer func() {
 
 ```go
 defer func() {
-        err := rows.Close()
-        if err != nil {
-                return err
-        }
+    err := rows.Close()
+    if err != nil {
+            return err
+    }
 }()
 ```
 
@@ -74,29 +74,29 @@ defer func() {
 
 ```go
 func getBalance(db *sql.DB, clientID string) (
-        balance float32, err error) {
-        rows, err := db.Query(query, clientID)
+    balance float32, err error) {
+    rows, err := db.Query(query, clientID)
+    if err != nil {
+        return 0, err
+    }
+    defer func() {
+        err = rows.Close()
+    }()
+
+    if rows.Next() {
+        err := rows.Scan(&balance)
         if err != nil {
-                return 0, err
+            return 0, err
         }
-        defer func() {
-                err = rows.Close()
-        }()
-    
-        if rows.Next() {
-                err := rows.Scan(&balance)
-                if err != nil {
-                        return 0, err
-                }
-                return balance, nil
-        }
-        // ...
+        return balance, nil
+    }
+    // ...
 }
 ```
 
 一旦正确创建了 `rows` 变量，我们将在匿名函数中推迟对 `rows.Close()` 的调用。此函数将错误分配给 `err` 变量，使用命名结果参数进行初始化。
 
-这段代码可能看起来不错；但是，它有一个问题。事实上，如果 `rows.Scan` 返回错误，`rows.Close` 无论如何都会被执行 。然而，由于此调用覆盖了 `getBalance` 返回的错误，而不是返回错误，如果 `rows.Close` 成功返回，我们可能会返回 nil 错误 。换句话说，如果调用 `db.Query` 成功（函数的第一行），`getBalance` 返回的错误将始终是 `rows.Close` 返回的错误，这不是我们想要的。
+这段代码可能看起来不错；但是，它有一个问题。事实上，如果 `rows.Scan` 返回错误，`rows.Close` 无论如何都会被执行。然而，由于此调用覆盖了 `getBalance` 返回的错误，而不是返回错误，如果 `rows.Close` 成功返回，我们可能会返回 nil 错误。换句话说，如果调用 `db.Query` 成功（函数的第一行），`getBalance` 返回的错误将始终是 `rows.Close` 返回的错误，这不是我们想要的。
 
 实现的逻辑并不简单。如果 `rows.Scan` 成功：
 
@@ -112,14 +112,14 @@ func getBalance(db *sql.DB, clientID string) (
 
 ```go
 defer func() {
-        closeErr := rows.Close()
-        if err != nil {
-                if closeErr != nil {
-                        log.Printf("failed to close rows: %v", err)
-                }
-                return
+    closeErr := rows.Close()
+    if err != nil {
+        if closeErr != nil {
+            log.Printf("failed to close rows: %v", err)
         }
-        err = closeErr
+        return
+    }
+    err = closeErr
 }()
 ```
 

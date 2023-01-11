@@ -1,4 +1,4 @@
-## 7.5 两次处理错误
+## 7.5 重复处理了两次错误
 
 多次处理错误是开发人员经常犯的错误，而不是专门在 Go 中。让我们了解为什么这是一个问题以及如何有效地处理错误。
 
@@ -6,31 +6,31 @@
 
 ```go
 func GetRoute(srcLat, srcLng, dstLat, dstLng float32) (Route, error) {
-        err := validateCoordinates(srcLat, srcLng)
-        if err != nil {
-                log.Println("failed to validate source coordinates")
-                return Route{}, err
-        }
+    err := validateCoordinates(srcLat, srcLng)
+    if err != nil {
+        log.Println("failed to validate source coordinates")
+        return Route{}, err
+    }
 
-        err = validateCoordinates(dstLat, dstLng)
-        if err != nil {
-                log.Println("failed to validate target coordinates")
-                return Route{}, err
-        }
+    err = validateCoordinates(dstLat, dstLng)
+    if err != nil {
+        log.Println("failed to validate target coordinates")
+        return Route{}, err
+    }
 
-        return getRoute(srcLat, srcLng, dstLat, dstLng)
+    return getRoute(srcLat, srcLng, dstLat, dstLng)
 }
 
 func validateCoordinates(lat, lng float32) error {
-        if lat > 90.0 || lat < -90.0 {
-                log.Printf("invalid latitude: %f", lat)
-                return fmt.Errorf("invalid latitude: %f", lat)
-        }
-        if lng > 180.0 || lng < -180.0 {
-                log.Printf("invalid longitude: %f", lng)
-                return fmt.Errorf("invalid longitude: %f", lng)
-        }
-        return nil
+    if lat > 90.0 || lat < -90.0 {
+        log.Printf("invalid latitude: %f", lat)
+        return fmt.Errorf("invalid latitude: %f", lat)
+    }
+    if lng > 180.0 || lng < -180.0 {
+        log.Printf("invalid longitude: %f", lng)
+        return fmt.Errorf("invalid longitude: %f", lng)
+    }
+    return nil
 }
 ```
 
@@ -79,25 +79,25 @@ func validateCoordinates(lat, lng float32) error {
 2021/06/01 20:35:12 invalid latitude: 200.000000
 ```
 
-这个新的 Go 版本的代码完美吗？并不真地。例如，第一个实现在无效纬度的情况下导致两个日志。不过，我们知道哪个对 `validateCoordinates` 的调用失败了：源坐标或目标坐标。在这里，我们丢失了这些信息。因此，我们需要为错误添加额外的上下文。
+这个新的 Go 版本的代码完美吗？还不是最完美。例如，第一个实现在无效纬度的情况下返回两个日志。不过，我们知道哪个对 `validateCoordinates` 的调用失败了：源坐标或目标坐标。在这里，我们丢失了这些信息。因此，我们需要为错误添加额外的上下文。
 
 让我们使用 Go 1.13 错误包装重写最新版本的代码（我们将省略 `validateCoordinates`，因为它将保持不变）：
 
 ```go
 func GetRoute(srcLat, srcLng, dstLat, dstLng float32) (Route, error) {
-        err := validateCoordinates(srcLat, srcLng)
-        if err != nil {
-                return Route{},
-                        fmt.Errorf("failed to validate source coordinates: %w", err)
-        }
+    err := validateCoordinates(srcLat, srcLng)
+    if err != nil {
+        return Route{},
+                fmt.Errorf("failed to validate source coordinates: %w", err)
+    }
 
-        err = validateCoordinates(dstLat, dstLng)
-        if err != nil {
-                return Route{},
-                        fmt.Errorf("failed to validate target coordinates: %w", err)
-        }
+    err = validateCoordinates(dstLat, dstLng)
+    if err != nil {
+        return Route{},
+                fmt.Errorf("failed to validate target coordinates: %w", err)
+    }
 
-        return getRoute(srcLat, srcLng, dstLat, dstLng)
+    return getRoute(srcLat, srcLng, dstLat, dstLng)
 }
 ```
 
