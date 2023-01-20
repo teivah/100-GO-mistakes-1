@@ -41,7 +41,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 * 在 HTTP/2 请求下，当请求被取消时
 * 或者当响应被写回客户端时
 
-在前两种情况下，我们可能会正确处理事情。例如，如果我们刚刚收到来自 `doSomeTask` 的响应，但客户端已关闭连接，则可以在上下文已取消的情况下调用 `publish`，这样消息就不会发布。但是最后一个案例呢？
+在前两种情况下，我们可能会正确处理事情。例如，如果我们刚刚收到来自 `doSomeTask` 的响应，但客户端已关闭连接，则可以在上下文已取消的情况下调用 `publish`，这样消息就不会发布。但是最后一种情况呢？
 
 当响应被写入客户端时，与请求关联的上下文将被取消。因此，我们面临一个竞争条件：
 
@@ -69,11 +69,11 @@ type Context interface {
     Deadline() (deadline time.Time, ok bool)
     Done() <-chan struct{}
     Err() error
-	Value(key any) any
+    Value(key any) any
 }
 ```
 
-上下文的截止日期由 `Deadline` 方法管理，取消信号通过 `Done` 和 `Err` 方法管理。当截止日期已过或上下文已被取消时，`Done` 应该返回一个关闭的通道，而 `Err` 应该返回一个错误。 最后，这些值是通过 `Value` 方法携带的。
+上下文的截止日期由 `Deadline` 方法管理，取消信号通过 `Done` 和 `Err` 方法管理。当截止日期已过或上下文已被取消时，`Done` 应该返回一个关闭的通道，而 `Err` 应该返回一个错误。最后，这些值是通过 `Value` 方法携带的。
 
 让我们创建一个自定义上下文，它将取消信号从父上下文中分离出来：
 
