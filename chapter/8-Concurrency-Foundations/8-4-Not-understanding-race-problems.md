@@ -1,4 +1,4 @@
-## 8.4 迷惑的竞争问题
+## 8.4 竞争问题引入的坑
 
 竞争问题可能是程序员可能面临的最困难和最隐蔽的错误之一。作为 Go 开发人员，我们必须了解数据竞争和竞争条件等关键方面、它们可能的影响以及如何避免它们。我们将首先讨论数据竞争与竞争条件来解决这些问题，然后我们将深入研究 Go 内存模型并解释其重要性。
 
@@ -9,13 +9,13 @@
 ```go
 i := 0
     
-    go func() {
-        i++
-    }()
-    
-    go func() {
-        i++
-    }()
+go func() {
+    i++
+}()
+
+go func() {
+    i++
+}()
 ```
 
 如果我们使用 Go 竞争检测器（`‑race` 选项）运行此代码，它将警告我们发生了数据竞争：
@@ -105,24 +105,24 @@ var i int64
 
 ```go
 i := 0
-    mutex := sync.Mutex{}
-    
-    go func() {
-            mutex.Lock()
-            i++
-            mutex.Unlock()
-    }()
-    
-    go func() {
-            mutex.Lock()
-            i++
-            mutex.Unlock()
-    }()
+mutex := sync.Mutex{}
+
+go func() {
+    mutex.Lock()
+    i++
+    mutex.Unlock()
+}()
+
+go func() {
+    mutex.Lock()
+    i++
+    mutex.Unlock()
+}()
 ```
 
 在此示例中，递增 `i` 是关键部分。不管 goroutines 的顺序如何，这个例子也为 `i` 产生了一个确定性的值：2。
 
-哪种方法效果最好？ 边界非常简单。 正如我们提到的，`atomic` 包只适用于特定类型。如果我们想要使用其他变量类型（例如，切片、映射和结构），我们就不能再依赖 `atomic` 了。
+哪种方法效果最好？边界非常简单。正如我们提到的，`atomic` 包只适用于特定类型。如果我们想要使用其他变量类型（例如，切片、映射和结构），我们就不能再依赖 `atomic` 了。
 
 另一种可能的选择是防止共享相同的内存位置，而是支持跨 goroutine 的通信。例如，我们可以决定为每个 goroutine 创建一个通道来产生增量值：
 
@@ -131,11 +131,11 @@ i := 0
 ch := make(chan int)
 
 go func() {
-        ch <- 1
+    ch <- 1
 }()
 
 go func() {
-        ch <- 1
+    ch <- 1
 }()
 
 i += <-ch
@@ -197,16 +197,16 @@ Go 内存模型是一种规范，它定义了在不同的 goroutine 中写入同
 ```go
 i := 0
 go func() {
-        i++
+    i++
 }()
 ```
 
-* 相反，goroutine 的退出不能保证在任何事件之前发生。 因此，以下示例存在数据竞争：
+* 相反，goroutine 的退出不能保证在任何事件之前发生。因此，以下示例存在数据竞争：
 
 ```go
 i := 0
 go func() {
-        i++
+    i++
 }()
 fmt.Println(i)
 ```
@@ -217,8 +217,8 @@ fmt.Println(i)
 i := 0
 ch := make(chan struct{})
 go func() {
-        <-ch
-        fmt.Println(i)
+    <-ch
+    fmt.Println(i)
 }()
 i++
 ch <- struct{}{}
@@ -238,8 +238,8 @@ ch <- struct{}{}
 i := 0
 ch := make(chan struct{})
 go func() {
-        <-ch
-        fmt.Println(i)
+    <-ch
+    fmt.Println(i)
 }()
 i++
 close(ch)
@@ -255,8 +255,8 @@ close(ch)
 i := 0
 ch := make(chan struct{}, 1)
 go func() {
-        i = 1
-        <-ch
+    i = 1
+    <-ch
 }()
 ch <- struct{}{}
 fmt.Println(i)
@@ -272,8 +272,8 @@ fmt.Println(i)
 i := 0
 ch := make(chan struct{})
 go func() {
-        i = 1
-        <-ch
+    i = 1
+    <-ch
 }()
 ch <- struct{}{}
 fmt.Println(i)

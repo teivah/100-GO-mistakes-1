@@ -14,7 +14,7 @@
 * 所有线程都可以消耗 CPU 周期，而不会产生太多等待时间(饥饿时间)。 
 * 工作负载尽可能均匀地分布在不同的 CPU 内核之间
 
-> **Note** note线程一词在 CPU 级别上也可以具有不同的含义。每个物理核可以由多个逻辑核（超线程的概念）组成，一个逻辑核也称为线程。在本节中，当我们使用线程一词时，它指的不是逻辑核心，而是处理单元的概念。
+> **Note** 线程一词在 CPU 级别上也可以具有不同的含义。每个物理核可以由多个逻辑核（超线程的概念）组成，一个逻辑核也称为线程。在本节中，当我们使用线程一词时，它指的不是逻辑核心，而是处理单元的概念。
 
 一个 CPU 核心执行不同的线程。当它从一个线程切换到另一个线程时，它会执行一项称为上下文切换的操作。消耗 CPU 周期的活动线程处于 *执行* 状态并移动到 *可运行* 状态，这意味着准备执行但等待可用内核。上下文切换被认为是一项昂贵的操作，因为操作系统需要在切换之前保存线程的当前执行状态（例如，当前寄存器值）。
 
@@ -28,15 +28,15 @@
 
 在内部，Go 调度器使用以下术语：
 
-* G:协程
+* G:协程 goroutine
 * M:操作系统线程（代表机器）
-* P:CPU核心（代码处理器）
+* P:CPU核心（代表处理器）
 
 每个 OS 线程 (M) 由 OS 调度程序分配给一个 CPU 内核 (P)。然后，每个 goroutine (G) 在一个 OS 线程 (M) 上运行。`GOMAXPROCS` 变量定义了负责同时执行用户级代码的操作系统线程 (M) 的限制。然而，如果线程在系统调用（例如 I/O）中被阻塞，调度程序可以启动更多操作系统线程 (M)。从 Go 1.5 开始，`GOMAXPROCS` 默认等于可用 CPU 内核的数量。
 
 goroutine 的生命周期比 OS 线程更简单。它可以是：
 
-* 执行中(Executing):goroutine 被调度在一个 M 上并执行它的指示
+* 执行中(Executing):goroutine 被调度在一个 M 上并执行它的指令
 * 待执行(Runnable):等待被置为执行状态 
 * 排队中(Waiting):停止并等待某事完成，例如系统调用或同步操作（例如，互斥锁(mutex)）
 
@@ -81,18 +81,18 @@ runtime.schedule() {
 
 ```go
 func sequentialMergesort(s []int) {
-        if len(s) <= 1 {
-                return
-        }
+    if len(s) <= 1 {
+        return
+    }
 
-        middle := len(s) / 2
-        sequentialMergesort(s[:middle])
-        sequentialMergesort(s[middle:])
-        merge(s, middle)
+    middle := len(s) / 2
+    sequentialMergesort(s[:middle])
+    sequentialMergesort(s[middle:])
+    merge(s, middle)
 }
 
 func merge(s []int, middle int) {
-        // ...
+    // ...
 }
 ```
 
@@ -100,26 +100,26 @@ func merge(s []int, middle int) {
 
 ```go
 func parallelMergesortV1(s []int) {
-        if len(s) <= 1 {
-                return
-        }
+    if len(s) <= 1 {
+        return
+    }
 
-        middle := len(s) / 2
-        var wg sync.WaitGroup
-        wg.Add(2)
-        
-        go func() {
-            defer wg.Done()
-            parallelMergesortV1(s[:middle])
-        }()
-        
-        go func() {
-            defer wg.Done()
-            parallelMergesortV1(s[middle:])
-        }()
-        
-        wg.Wait()
-        merge(s, middle)
+    middle := len(s) / 2
+    var wg sync.WaitGroup
+    wg.Add(2)
+    
+    go func() {
+        defer wg.Done()
+        parallelMergesortV1(s[:middle])
+    }()
+    
+    go func() {
+        defer wg.Done()
+        parallelMergesortV1(s[middle:])
+    }()
+    
+    wg.Wait()
+    merge(s, middle)
 }
 ```
 
@@ -138,48 +138,47 @@ Benchmark_parallelMergesortV1-4 17525998709 ns/op
 
 如果我们有一个切片，比如 1024 个元素，父 goroutine 将启动两个 goroutine，每个负责处理由 512 个元素组成的一半。然后，这些 goroutine 中的每一个都会启动两个新的 goroutine 来负责处理 256 个元素。然后是 128，以此类推，直到我们启动一个 goroutine 来计算单个元素。
 
-如果我们想要并行化的工作负载太小，意味着我们要计算得太快，那么跨核分配作业的好处就会被破坏。 事实上，与直接合并当前 goroutine 中的少量项目相比，创建 goroutine 并让调度程序执行它所花费的时间太长了。 虽然 goroutines 是轻量级的，启动起来比线程快，但我们仍然会面临工作量太小的情况。
+如果我们想要并行化的工作负载太小，意味着我们要计算得太快，那么跨核分配作业的好处就会被破坏。事实上，与直接合并当前 goroutine 中的少量项目相比，创建 goroutine 并让调度程序执行它所花费的时间太长了。虽然 goroutines 是轻量级的，启动起来比线程快，但我们仍然会面临工作量太小的情况。
 
 > **Note** 我们将在不使用 Go 诊断工具中讨论如何更深入地了解何时执行的并行性不佳。
 
 那么我们怎样才能克服这个结果呢？是不是意味着归并排序算法不能并行化？等等，没那么快。
 
-让我们尝试另一种方法。因为在一个新的 goroutine 中合并少量元素效率不高，让我们定义一个阈值。这个阈值将表示以并行方式处理它应该有多大的一半。如果一半低于这个值，我们将按顺序处理。
-这是一个新版本：
+让我们尝试另一种方法。因为在一个新的 goroutine 中合并少量元素效率不高，让我们定义一个阈值。这个阈值将表示以并行方式处理它应该有多大的一半。如果一半低于这个值，我们将按顺序处理。下面是一个新版本：
 
 ```go
 const max = 2048
     
 func parallelMergesortV2(s []int) {
-        if len(s) <= 1 {
-                return
-        }
+    if len(s) <= 1 {
+        return
+    }
 
-        if len(s) <= max {
-                sequentialMergesort(s)
-        } else {
-                middle := len(s) / 2
+    if len(s) <= max {
+        sequentialMergesort(s)
+    } else {
+        middle := len(s) / 2
 
-                var wg sync.WaitGroup
-                wg.Add(2)
+        var wg sync.WaitGroup
+        wg.Add(2)
 
-                go func() {
-                        defer wg.Done()
-                        parallelMergesortV2(s[:middle])
-                }()
+        go func() {
+            defer wg.Done()
+            parallelMergesortV2(s[:middle])
+        }()
 
-                go func() {
-                        defer wg.Done()
-                        parallelMergesortV2(s[middle:])
-                }()
-                
-                wg.Wait()
-                merge(s, middle)
-        }
+        go func() {
+            defer wg.Done()
+            parallelMergesortV2(s[middle:])
+        }()
+        
+        wg.Wait()
+        merge(s, middle)
+    }
 }
 ```
 
-如果该值小于 max ，我们称为顺序版本。否则，我们将继续调用我们的并行实现。对结果有影响吗？是的，它确实：
+如果该值小于 max，我们称为顺序版本。否则，我们将继续调用我们的并行实现。对结果有影响吗？是的，它确实：
 
 ```shell
 Benchmark_sequentialMergesort-4 2278993555 ns/op
@@ -197,6 +196,6 @@ Benchmark_parallelMergesortV2-4 1313010260 ns/op
 
 那么，我们应该怎么选择呢？首先，我们必须记住，并发并不总是更快，不应该被认为是解决所有问题的默认方法。首先，它使事情变得更加复杂。此外，现代 CPU 在执行顺序代码和可预测代码方面变得异常高效。例如，超标量处理器可以在单个内核上以高效率并行执行指令。
 
-这是否意味着我们不应该使用并发？当然不是。但是，必须牢记这些结论。如果我们不确定 并行版本是否会更快，也许正确的方法是首先从一个简单且顺序的版本开始，并从这里构建，这要归功于分析（_不使用 Go 诊断工具_）和基准测试（_编写不准确的基准测试_）。它可能是确保值得使用并发的唯一方法。
+这是否意味着我们不应该使用并发？当然不是。但是，必须牢记这些结论。如果我们不确定并行版本是否会更快，也许正确的方法是首先从一个简单且顺序的版本开始，并从这里构建，这要归功于分析（_不使用 Go 诊断工具_）和基准测试（_编写不准确的基准测试_）。它可能是确保值得使用并发的唯一方法。
 
 下一节将讨论一个非常常见的问题：何时使用通道或互斥锁？
