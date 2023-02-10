@@ -1,10 +1,10 @@
-## 9.12 快忘了 sync.Cond 吧
+## 9.12 被遗忘的 sync.Cond
 
-在 `sync` 包中的同步原语中，`sync.Cond` 可能是最少被使用和理解的。但是，它带来了我们通过 channel 无法实现的功能。本节将通过一个具体示例来了解 `sync.Cond` 何时有用以及如何使用它。
+在 `sync` 包中的同步原语中，`sync.Cond` 可能是最少被使用和理解的。但是，它带来了我们通过通道无法实现的功能。本节将通过一个具体示例来了解 `sync.Cond` 何时有用以及如何使用它。
 
 本节的示例旨在实现捐赠目标机制，这意味着应用程序会在达到特定目标时发出警报。
 
-我们创建一个 goroutine 负责增加余额（我们称之为 updater goroutine）。相比之下，其他 goroutine 将接收更新并在达到特定目标时打印一条消息（我们称其为 listener goroutines）。例如，一个 goroutine 正在等待 10 美元的捐赠目标，而另一个 goroutine 正在等待 15 美元的捐赠目标。
+我们创建一个 goroutine 负责增加余额（我们称之为 updater goroutine）。相对而言，其他 goroutine 将接收更新并在达到特定目标时打印一条消息（我们称其为 listener goroutines）。例如，一个 goroutine 正在等待 10 美元的捐赠目标，而另一个 goroutine 正在等待 15 美元的捐赠目标。
 
 第一个被自然想到的解决方案可能是使用互斥锁。updater goroutine 会每秒增加余额。另一方面，listener goroutine 会循环，直到达到他们的捐赠目标：
 
@@ -48,7 +48,7 @@ $15 goal reached
 
 主要问题以及使这种实现变得糟糕的原因是繁忙的循环。实际上，每个listener goroutine 都会一直循环，直到达到他们的捐赠目标，这将浪费大量 CPU 周期并使 CPU 使用量巨大。我们需要找到更好的解决方案。
 
-让我们退后一步，看看我们需要什么。每当余额更新时，我们必须找到一种从 updater goroutine 发出信号的方法。如果我们考虑 Go 中的信号命令，我们应该考虑通道。因此，让我们尝试使用通道原语 的另一个版本：
+让我们退后一步，看看我们需要什么。每当余额更新时，我们必须找到一种从 updater goroutine 发出信号的方法。如果我们考虑 Go 中的信号命令，我们应该考虑通道。因此，让我们尝试使用通道原语的另一个版本：
 
 ```go
 type Donation struct {
@@ -140,7 +140,7 @@ for {
 }
 ```
 
-首先，我们使用 `sync.NewCond` 创建一个 `*sync.Cond` 并提供一个 `*sync.Mutex`。那么，listener goroutine 和updater goroutine 呢？
+首先，我们使用 `sync.NewCond` 创建一个 `*sync.Cond` 并提供一个 `*sync.Mutex`。那么，listener goroutine 和 updater goroutine 呢？
 
 listener goroutines 循环，直到达到捐赠余额。在循环中，我们使用 `Wait` 方法，该方法将阻塞直到满足条件。
 
@@ -172,7 +172,7 @@ listener goroutines 循环，直到达到捐赠余额。在循环中，我们使
 
 我们还要注意使用 `sync.Cond` 时可能存在的一个缺点。例如，当我们向 `chan struct` 发送通知时，即使没有活动的接收者，消息也会被缓冲，从而保证最终会收到此通知。将 `sync.Cond` 与 `Broadcast` 方法一起使用会唤醒当前等待该条件的所有 goroutines，如果没有，通知将被错过。这也是我们必须牢记的一个基本原则。
 
-> **Note** 在这里，这段代码不会阻塞，因为没有 goroutine 等待在这个通道中接收消息。 这与 `Signal()` 的原理相同。
+> **Note** 在这里，这段代码不会阻塞，因为没有 goroutine 等待在这个通道中接收消息。这与 `Signal()` 的原理相同。
 > 
 > 我们还应该注意一种使用 `Signal()` 而不是 `Broadcast` 来只唤醒一个 goroutine 的方法。就语义而言，它与以非阻塞方式在 `chan struct` 中发送消息相同：
 
