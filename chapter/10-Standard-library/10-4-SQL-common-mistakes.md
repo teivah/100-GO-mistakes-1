@@ -1,8 +1,8 @@
-## 10.4 SQL常见错误
+## 10.4 SQL 类库的常见错误
 
 `database/sql` 提供了一个围绕 SQL（或类似 SQL）数据库的通用接口。在使用这个包时发现常见的模式或错误也很常见。让我们深入研究五个常见错误。
 
-### 10.4.1 `sql.Open` 不一定会建立到数据库的连接
+### 10.4.1 `sql.Open` 不一定会建立数据库的连接
 
 使用 `sql.Open` 时，一个常见的误解是期望此函数实际上建立与数据库的连接：
 
@@ -115,7 +115,7 @@ var (
 for rows.Next() {
     err := rows.Scan(&department, &age)
     if err != nil {
-            return err
+        return err
     }
     // ...
 }
