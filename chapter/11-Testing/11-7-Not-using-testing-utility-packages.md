@@ -1,6 +1,6 @@
-## 11.7 不使用测试工具包
+## 11.7 原生测试包，好处多
 
-标准库提供了用于测试的实用程序包。一个常见的错误是不了解这些软件包并试图重新发明轮子或依赖其他不太方便的解决方案。本节将深入研究其中的两个包，一个在使用 HTTP 时为我们提 供帮助，另一个在执行 I/O 以及使用 reader 和 writers 时提供帮助。
+标准库提供了用于测试的实用程序包。一个常见的错误是不了解这些软件包并试图重新发明轮子或依赖其他不太方便的解决方案。本节将深入研究其中的两个包，一个在使用 HTTP 时为我们提供帮助，另一个在执行 I/O 以及使用 reader 和 writers 时提供帮助。
 
 ### 11.7.1 `httptest`
 
@@ -17,7 +17,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-HTTP 处理程序接受两个参数：请求和写入响应的方式。`httptest` 包为两者提供了实用程序。对于请求，我们可以使用 `httptest.NewRequest` 使用 HTTP 方法、URL 和 正文构建 `*http.Request`。关于响应，我们可以使用 `httptest.NewRecorder` 来记录处理程序中发生的变化。让我们编写这个处理程序的单元测试：
+HTTP 处理程序接受两个参数：请求和写入响应的方式。`httptest` 包为两者提供了实用程序。对于请求，我们可以使用 `httptest.NewRequest` 使用 HTTP 方法、URL 和正文构建 `*http.Request`。关于响应，我们可以使用 `httptest.NewRecorder` 来记录处理程序中发生的变化。让我们编写这个处理程序的单元测试：
 
 ```go
 func TestHandler(t *testing.T) {
@@ -45,7 +45,7 @@ func TestHandler(t *testing.T) {
 
 当我们想要测试 HTTP 客户端时，让我们看看硬币的另一面。
 
-我们将编写一个客户端来负责查询一个 HTTP 端点，该端点计算从一个坐标驱动到另一个坐标需 要多长时间。客户端看起来像这样：
+我们将编写一个客户端来负责查询一个 HTTP 端点，该端点计算从一个坐标驱动到另一个坐标需要多长时间。客户端看起来像这样：
 
 ```go
 func (c DurationClient) GetDuration(url string,
@@ -153,7 +153,7 @@ func TestFoo(t *testing.T) {
 }
 ```
 
-在这里，我们使用 `io.TimeoutReader` 包装了一个 `io.Reader`。正如我们提到的，第二次读取将失败。如果我们运行这个测试来确保我们的函数容错，我们将得到一个测试失败。 事实上，`io.ReadAll` 会返回它发现的任何错误。 
+在这里，我们使用 `io.TimeoutReader` 包装了一个 `io.Reader`。正如我们提到的，第二次读取将失败。如果我们运行这个测试来确保我们的函数容错，我们将得到一个测试失败。事实上，`io.ReadAll` 会返回它发现的任何错误。 
 
 知道了这一点，我们就可以实现我们的自定义 `readAll` 函数，它最多可以容忍 n 个错误：
 
@@ -192,7 +192,7 @@ func foo(r io.Reader) error {
 }
 ```
 
-我们已经看到了一个示例，说明如何在从 `io.Reader` 读取数据时检查函数是否容错。 我们依靠 `iotest` 包进行了测试。
+我们已经看到了一个示例，说明如何在从 `io.Reader` 读取数据时检查函数是否容错。我们依靠 `iotest` 包进行了测试。
 
 在进行 I/O 并使用 `io.Reader` 和 `io.Writer` 时，让我们记住 `iotest` 包是多么方便。正如我们所见，它提供了实用程序，包括一些用于测试自定义 `io.Reader` 行为的实用程序，以及测试我们的应用程序在读取或写入数据时是否发生错误的功能。
 
