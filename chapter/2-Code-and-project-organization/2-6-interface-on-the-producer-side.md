@@ -20,12 +20,12 @@
 package store
 
 type CustomerStorage interface {
-        StoreCustomer(customer Customer) error
-        GetCustomer(id string) (Customer, error)
-        UpdateCustomer(customer Customer) error
-        GetAllCustomers() ([]Customer, error)
-        GetCustomersWithoutContract() ([]Customer, error)
-        GetCustomersWithNegativeBalance() ([]Customer, error)
+    StoreCustomer(customer Customer) error
+    GetCustomer(id string) (Customer, error)
+    UpdateCustomer(customer Customer) error
+    GetAllCustomers() ([]Customer, error)
+    GetCustomersWithoutContract() ([]Customer, error)
+    GetCustomersWithNegativeBalance() ([]Customer, error)
 }
 ```
 
@@ -35,13 +35,13 @@ type CustomerStorage interface {
 
 相反，由客户决定他是否需要某种形式的抽象，然后确定最适合他的需要的抽象级别。
 
-在前面的示例中，也许一个调用方不会对解耦他的代码感兴趣。 也许另一个客户想要解耦他的代码，但只对 `GetAllCustomers` 方法感兴趣。 在这种情况下，它可以使用单个方法创建一个接口，从外部包中引用 `Customer` 结构：
+在前面的示例中，也许一个调用方不会对解耦他的代码感兴趣。也许另一个客户想要解耦他的代码，但只对 `GetAllCustomers` 方法感兴趣。 在这种情况下，它可以使用单个方法创建一个接口，从外部包中引用 `Customer` 结构：
 
 ```go
 package client
 
 type customersGetter interface {
-        GetAllCustomers() ([]store.Customer, error)
+    GetAllCustomers() ([]store.Customer, error)
 }
 ```
 
@@ -50,6 +50,7 @@ type customersGetter interface {
 ![](https://img.exciting.net.cn/29.png)
 
 有几点需要注意：
+
 * 由于 `customersGetter` 接口仅在 `client`包中被使用，它可以保持未导出。
 * 从视觉上看，它看起来像循环依赖。 但是，由于隐式满足接口，因此 `store` 与 `client` 之间没有依赖关系。这就是为什么这种方法在具有显式实现的语言中并不总是可行的原因。
 

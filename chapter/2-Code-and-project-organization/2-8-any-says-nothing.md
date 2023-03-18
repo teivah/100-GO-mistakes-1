@@ -1,23 +1,23 @@
 ## 2.8 `any` say nothing
 
-在 Go 中，指定零方法的接口类型称为空接口：`interface{}`。从Go 1.18开始，预声明的类型 `any` 已成为空接口的别名。因此，所有 `interface{}` 事件都可以替换为 `any`。然而，在许多情况下，`any` 都可以被视为过度概括。让我们首先关注我们核心概念，然后我们将讨论潜在的问题。
+在 Go 中，指定零方法的接口类型称为空接口：`interface{}`。从 Go 1.18开始，预声明的类型 `any` 已成为空接口的别名。因此，所有 `interface{}` 事件都可以替换为 `any`。然而，在许多情况下，`any` 都可以被视为过度概括。让我们首先关注我们核心概念，然后我们将讨论潜在的问题。
 
 一个 `any` 类型可以容纳任何类型的值：
 
 ```go
 func main() {
-        var i any
+    var i any
 
-        i = 42
-		i = "foo"
-        i = struct {
-            s string
-        }{
-            s: "bar",
-        }
-        i = f
-        
-        _ = i
+    i = 42
+    i = "foo"
+    i = struct {
+        s string
+    }{
+        s: "bar",
+    }
+    i = f
+    
+    _ = i
 }
 
 func f() {}
@@ -31,16 +31,16 @@ func f() {}
 package store
 
 type Customer struct{
-        // Some fields
+    // Some fields
 }
 type Contract struct{
-        // Some fields
+    // Some fields
 }
 
 type Store struct{}
 
 func (s *Store) Get(id string) (any, error) {
-        // ...
+    // ...
 }
 
 func (s *Store) Set(id string, v any) error {
@@ -61,18 +61,18 @@ s.Set("foo", 42)
 
 ```go
 func (s *Store) GetContract(id string) (Contract, error) {
-        // ...
+    // ...
 }
 
 func (s *Store) SetContract(id string, contract Contract) error {
-        // ...
+    // ...
 }
 func (s *Store) GetCustomer(id string) (Customer, error) {
-// ...
+    // ...
 }
 
 func (s *Store) SetCustomer(id string, customer Customer) error {
-// ...
+    // ...
 }
 ```
 
@@ -80,8 +80,8 @@ func (s *Store) SetCustomer(id string, customer Customer) error {
 
 ```go
 type ContractStorer interface {
-        GetContract(id string) (store.Contract, error)
-        SetContract(id string, contract store.Contract) error
+    GetContract(id string) (store.Contract, error)
+    SetContract(id string, contract store.Contract) error
 }
 ```
 
@@ -91,7 +91,7 @@ type ContractStorer interface {
 
 ```go
 func Marshal(v any) ([]byte, error) {
-        // ...
+    // ...
 }
 ```
 
@@ -99,8 +99,8 @@ func Marshal(v any) ([]byte, error) {
 
 ```go
 func (c *Conn) QueryContext(ctx context.Context, query string,
-        args ...any) (*Rows, error) {
-        // ...
+    args ...any) (*Rows, error) {
+    // ...
 }
 ```
 

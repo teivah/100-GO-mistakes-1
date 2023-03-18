@@ -1,6 +1,6 @@
 ## 2.3 滥用的 init 函数
 
-`init` 函数有时会在Go应用程序中被滥用。潜在的后果是糟糕的错误管理或难以理解的代码流。让我们重新思考一下什么是init函数。然后我们将查看何时建议或不建议使用它们。
+`init` 函数有时会在 Go 应用程序中被滥用。潜在的后果是糟糕的错误管理或难以理解的代码流。让我们重新思考一下什么是 init 函数。然后我们将查看何时建议或不建议使用它们。
 
 ### 2.3.1 概念
 
@@ -12,22 +12,22 @@ package main
 import "fmt"
 
 var a = func() int {
-        fmt.Println("var")
-        return 0
+    fmt.Println("var")
+    return 0
 }()
 
 func init() {
-        fmt.Println("init")
+    fmt.Println("init")
 }
 
 func main() {
-        fmt.Println("main")
+    fmt.Println("main")
 }
 ```
 
 运行此示例将打印以下输出：
 
-```go
+```shell
 var
 init
 main
@@ -39,18 +39,18 @@ main
 package main
 
 import (
-        "fmt"
+    "fmt"
 
-        "redis"
+    "redis"
 )
 
 func init() {
-        // ...
+    // ...
 }
 
 func main() {
-        err := redis.Store("foo", "bar")
-        // ...
+    err := redis.Store("foo", "bar")
+    // ...
 }
 ```
 
@@ -67,7 +67,7 @@ func Store(key, value string) error {
 }
 ```
 
-因为 `main` 依赖 `redis` 先执行，`redis` 包的init 函数将是第一个执行，然后是 `main` 包的 init，然后是 `main` 函数本身，如下图：
+因为 `main` 依赖 `redis` 先执行，`redis` 包的 init 函数将是第一个执行，然后是 `main` 包的 init，然后是 `main` 函数本身，如下图：
 
 ![](https://img.exciting.net.cn/25.png)
 
@@ -81,11 +81,11 @@ package main
 import "fmt"
 
 func init() {
-        fmt.Println("init 1")
+    fmt.Println("init 1")
 }
 
 func init() {
-        fmt.Println("init 2")
+    fmt.Println("init 2")
 }
 
 func main() {
@@ -94,7 +94,7 @@ func main() {
 
 执行的第一个 `init` 函数是源顺序中的第一个：
 
-```go
+```shell
 init 1
 init 2
 ```
@@ -105,13 +105,13 @@ init 2
 package main
 
 import (
-        "fmt"
+    "fmt"
 
-        _ "foo"
+    _ "foo"
 )
 
 func main() {
-        // ...
+    // ...
 }
 ```
 
@@ -125,7 +125,7 @@ package main
 func init() {}
 
 func main() {
-        init()
+    init()
 }
 ```
 
@@ -142,22 +142,22 @@ $ go build .
 
 首先，让我们看一个使用 `init` 函数可能被认为不合适的示例：保存数据库连接池。
 
-在`init`函数中，我们将使用 `sql.Open` 打开一个数据库。我们将使这个数据库成为函数以后可以使用的全局变量。
+在 `init` 函数中，我们将使用 `sql.Open` 打开一个数据库。我们将使这个数据库成为函数以后可以使用的全局变量。
 
 ```go
 var db *sql.DB
 
 func init() {
-        dataSourceName := os.Getenv("MYSQL_DATA_SOURCE_NAME")
-        d, err := sql.Open("mysql", dataSourceName)
-        if err != nil {
-                log.Panic(err)
-        }
-        err = d.Ping()
-        if err != nil {
-                log.Panic(err)
-        }
-        db = d
+    dataSourceName := os.Getenv("MYSQL_DATA_SOURCE_NAME")
+    d, err := sql.Open("mysql", dataSourceName)
+    if err != nil {
+        log.Panic(err)
+    }
+    err = d.Ping()
+    if err != nil {
+        log.Panic(err)
+    }
+    db = d
 }
 ```
 
@@ -168,6 +168,7 @@ func init() {
 另一个重要的缺点与测试有关。如果我们在这个文件中添加测试，`init` 函数将在运行测试用例之前执行，这不一定是我们想要的。例如，如果我们在不需要创建此连接的实用程序函数上添加单元测试。因此，它会使编写单元测试变得复杂。
 
 最后一个缺点是它需要将数据库连接池分配给全局变量。全局变量有一些严重的缺点，例如：
+
 * 任何功能都可以在包中更改它们。
 * 它还可以使单元测试更加复杂，因为依赖于它的函数将不再被隔离。
 
@@ -177,18 +178,19 @@ func init() {
 
 ```go
 func createClient(dataSourceName string) (*sql.DB, error) {
-        db, err := sql.Open("mysql", dataSourceName)
-        if err != nil {
-                return nil, err
-        }
-        if err = db.Ping(); err != nil {
-                return nil, err
-        }
-        return db, nil
+    db, err := sql.Open("mysql", dataSourceName)
+    if err != nil {
+        return nil, err
+    }
+    if err = db.Ping(); err != nil {
+        return nil, err
+    }
+    return db, nil
 }
 ```
 
 使用此函数，我们解决了讨论的主要缺点：
+
 * 错误处理的责任留给调用者
 * 可以创建一个集成测试来检查这个函数的工作。
 * 连接池封装在函数内。
@@ -197,23 +199,23 @@ func createClient(dataSourceName string) (*sql.DB, error) {
 
 ```go
 func init() {
-        redirect := func(w http.ResponseWriter, r *http.Request) {
-                http.Redirect(w, r, "/", http.StatusFound)
-        }
-        http.HandleFunc("/blog", redirect)
-        http.HandleFunc("/blog/", redirect)
+    redirect := func(w http.ResponseWriter, r *http.Request) {
+        http.Redirect(w, r, "/", http.StatusFound)
+    }
+    http.HandleFunc("/blog", redirect)
+    http.HandleFunc("/blog/", redirect)
 
-        static := http.FileServer(http.Dir("static"))
-        http.Handle("/favicon.ico", static)
-        http.Handle("/fonts.css", static)
-        http.Handle("/fonts/", static)
+    static := http.FileServer(http.Dir("static"))
+    http.Handle("/favicon.ico", static)
+    http.Handle("/fonts.css", static)
+    http.Handle("/fonts/", static)
 
-        http.Handle("/lib/godoc/", http.StripPrefix("/lib/godoc/",
-                http.HandlerFunc(staticHandler)))
+    http.Handle("/lib/godoc/", http.StripPrefix("/lib/godoc/",
+        http.HandlerFunc(staticHandler)))
 }
 ```
 
-在这个例子中，`init` 函数不能失败（`http.HandleFunc` 可能会触发 panic，但前提是处理程序为`nil`，这里不是这种情况）。同时，不需要创建任何全局变量，也不会影响可能的单元测试。因此，此示例是一个很好的示例，其中 `init` 函数可能会有所帮助。
+在这个例子中，`init` 函数不能失败（`http.HandleFunc` 可能会触发 panic，但前提是处理程序为 `nil`，这里不是这种情况）。同时，不需要创建任何全局变量，也不会影响可能的单元测试。因此，此示例是一个很好的示例，其中 `init` 函数可能会有所帮助。
 
 总之，我们已经看到 `init` 函数可能会导致一些问题：
 

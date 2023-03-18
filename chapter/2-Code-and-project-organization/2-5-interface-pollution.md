@@ -1,6 +1,6 @@
 ## 2.5 接口污染
 
-在设计和构建我们的代码时，接口是 `Go` 语言的基石之一。然而，像许多工具或概念一样，滥用它通常不是一个好主意。接口污染是用不必要的抽象来压倒我们的代码，使其更难理解。这是来自具有不同习惯的另一种语言的开发人员所犯的常见错误。在深入探讨这个主题之前，让我们重新思考一下 `Go` 的接口。然后，我们将看到何时适合使用接口以及何时可能被视为污染。
+在设计和构建我们的代码时，接口是 Go 语言的基石之一。然而，像许多工具或概念一样，滥用它通常不是一个好主意。接口污染是用不必要的抽象来压倒我们的代码，使其更难理解。这是来自具有不同习惯的另一种语言的开发人员所犯的常见错误。在深入探讨这个主题之前，让我们重新思考一下 Go 的接口。然后，我们将看到何时适合使用接口以及何时可能被视为污染。
 
 ### 2.5.1 概念
 
@@ -16,7 +16,7 @@
 
 ```go
 type Reader interface {
-        Read(p []byte) (n int, err error)
+    Read(p []byte) (n int, err error)
 }
 ```
 
@@ -26,7 +26,7 @@ type Reader interface {
 
 ```go
 type Writer interface {
-        Write(p []byte) (n int, err error)
+    Write(p []byte) (n int, err error)
 }
 ```
 
@@ -43,7 +43,7 @@ type Writer interface {
 
 ```go
 func copySourceToDest(source io.Reader, dest io.Writer) error {
-        // ...
+    // ...
 }
 ```
 
@@ -53,34 +53,34 @@ func copySourceToDest(source io.Reader, dest io.Writer) error {
 
 ```go
 func TestCopySourceToDest(t *testing.T) {
-        const input = "foo"
-        source := strings.NewReader(input)
-        dest := bytes.NewBuffer(make([]byte, 0))
+    const input = "foo"
+    source := strings.NewReader(input)
+    dest := bytes.NewBuffer(make([]byte, 0))
 
-        err := copySourceToDest(source, dest)
-        if err != nil {
-                t.FailNow()
-        }
+    err := copySourceToDest(source, dest)
+    if err != nil {
+        t.FailNow()
+    }
 
-        got := dest.String()
-        if got != input {
-                t.Errorf("expected: %s, got: %s", input, got)
-        }
+    got := dest.String()
+    if got != input {
+        t.Errorf("expected: %s, got: %s", input, got)
+    }
 }
 ```
 
 `source` 是 `*strings.Reader` 而 `dest` 是 `*bytes.Buffer`。在这里，我们在不创建任何文件的情况下测试 `copySourceToDest` 的行为。
 
-此外，在设计接口时，需要牢记粒度（接口包含多少方法）。 Go 中的一句著名谚语与接口应该有多大有关：
+此外，在设计接口时，需要牢记粒度（接口包含多少方法）。Go 中的一句著名谚语与接口应该有多大有关：
 
 接口越大，抽象越弱。
 
-实际上，向接口添加方法会降低其可重用性。 `io.Reader` 和 `io.Writer` 是强大的抽象，因为它们不能变得更简单。此外，还可以组合细粒度的接口来创建更高级别的抽象。结合了读取器和写入器行为的 `io.ReadWriter` 就是这种情况：
+实际上，向接口添加方法会降低其可重用性。`io.Reader` 和 `io.Writer` 是强大的抽象，因为它们不能变得更简单。此外，还可以组合细粒度的接口来创建更高级别的抽象。结合了读取器和写入器行为的 `io.ReadWriter` 就是这种情况：
 
 ```go
 type ReadWriter interface {
-        Reader
-        Writer
+    Reader
+    Writer
 }
 ```
 
@@ -110,27 +110,27 @@ type ReadWriter interface {
 
 ```go
 type Interface interface {
-        Len() int
-        Less(i, j int) bool
-        Swap(i, j int)
+    Len() int
+    Less(i, j int) bool
+    Swap(i, j int)
 }
 ```
 
 该接口具有强大的可重用潜力，因为它包含对任何基于索引的集合进行排序的常见行为。
 
-在整个 `sort` 包中，我们可以找到几十个实现。例如，如果在某个时候我们计算了一个整数集合，并且我们需要对其进行排序，我们是否一定对实现类型感兴趣？例如，排序算法是归并排序还是快速排序是否重要？在许多情况下，我们不在乎。 因此，排序行为可以被抽象化，我们可以依赖于 `sort.Interface`。
+在整个 `sort` 包中，我们可以找到几十个实现。例如，如果在某个时候我们计算了一个整数集合，并且我们需要对其进行排序，我们是否一定对实现类型感兴趣？例如，排序算法是归并排序还是快速排序是否重要？在许多情况下，我们不在乎。因此，排序行为可以被抽象化，我们可以依赖于 `sort.Interface`。
 
 找到正确的抽象来分解行为也可以带来很多好处。例如，`sort` 包提供了同样依赖于 `sort.Interface` 的实用函数，例如检查一个集合是否已经排序：
 
 ```go
 func IsSorted(data Interface) bool {
-        n := data.Len()
-        for i := n - 1; i > 0; i-- {
-                if data.Less(i, i-1) {
-                        return false
-                }
+    n := data.Len()
+    for i := n - 1; i > 0; i-- {
+        if data.Less(i, i-1) {
+            return false
         }
-        return true
+    }
+    return true
 }
 ```
 
@@ -146,29 +146,29 @@ func IsSorted(data Interface) bool {
 
 ```go
 type CustomerService struct {
-        store mysql.Store
+    store mysql.Store
 }
 
 func (cs CustomerService) CreateNewCustomer(id string) error {
-        customer := Customer{id: id}
-        return cs.store.StoreCustomer(customer)
+    customer := Customer{id: id}
+    return cs.store.StoreCustomer(customer)
 }
 ```
 
-现在，如果我们想测试这个方法怎么办？由于 `customerService` 依赖于实际实现来存储需要启动 `MySQL` 实例的 `Customer` 集成测试（除非我们使用诸如 `go‑sqlmock` 之类的替代技术，但这不是本节的范围）。尽管集成测试很有帮助，但它并不总是我们想要做的。为 了给我们更大的灵活性，我们应该将 `CustomerService` 与实际实现分离，这可以通过如下接口完成：
+现在，如果我们想测试这个方法怎么办？由于 `customerService` 依赖于实际实现来存储需要启动 `MySQL` 实例的 `Customer` 集成测试（除非我们使用诸如 `go‑sqlmock` 之类的替代技术，但这不是本节的范围）。尽管集成测试很有帮助，但它并不总是我们想要做的。为了给我们更大的灵活性，我们应该将 `CustomerService` 与实际实现分离，这可以通过如下接口完成：
 
 ```go
 type customerStorer interface {
-        StoreCustomer(Customer) error
+    StoreCustomer(Customer) error
 }
 
 type CustomerService struct {
-        storer customerStorer
+    storer customerStorer
 }
 
 func (cs CustomerService) CreateNewCustomer(id string) error {
-        customer := Customer{id: id}
-        return cs.storer.StoreCustomer(customer)
+    customer := Customer{id: id}
+    return cs.storer.StoreCustomer(customer)
 }
 ```
 
@@ -188,15 +188,15 @@ func (cs CustomerService) CreateNewCustomer(id string) error {
 
 ```go
 type IntConfig struct {
-        // ...
+    // ...
 }
 
 func (c *IntConfig) Get() int {
-        // Retrieve configuration
+    // Retrieve configuration
 }
 
 func (c *IntConfig) Set(value int) {
-        // Update configuration
+    // Update configuration
 }
 ```
 
@@ -204,7 +204,7 @@ func (c *IntConfig) Set(value int) {
 
 ```go
 type intConfigGetter interface {
-        Get() int
+    Get() int
 }
 ```
 
@@ -212,16 +212,16 @@ type intConfigGetter interface {
 
 ```go
 type Foo struct {
-        threshold intConfigGetter
+    threshold intConfigGetter
 }
 
 func NewFoo(threshold intConfigGetter) Foo {
-        return Foo{threshold: threshold}
+    return Foo{threshold: threshold}
 }
 
 func (f Foo) Bar()  {
-        threshold := f.threshold.Get()
-        // ...
+    threshold := f.threshold.Get()
+    // ...
 }
 ```
 
@@ -249,6 +249,8 @@ func (f Foo) Bar()  {
 
 总之，我们在代码中创建抽象时应该谨慎。同样，应该发现抽象，而不是创建抽象。对于我们软件开发人员来说，通过根据我们认为以后可能需要的东西来猜测什么是完美的抽象级别来过度设计我们的代码是很常见的。应该避免这个过程，因为在大多数情况下，它会用不必要的抽象污染我们的代码，使其阅读起来更加复杂。让我们不要试图抽象地解决问题，而是解决现在必须解决的问题。最后但同样重要的是，如果不清楚接口如何使代码变得更好，我们可能应该考虑删除它以使我们的代码更简单。
 
-> 不要设计接口，要发现它们。--Rob Pike
+> 不要设计接口，要发现它们。
+> 
+> --Rob Pike
 
 下一节将讨论一个常见的接口错误，即在生产者端创建接口。

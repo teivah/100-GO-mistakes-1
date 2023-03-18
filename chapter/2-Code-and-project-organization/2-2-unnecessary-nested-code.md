@@ -6,51 +6,51 @@
 
 ```go
 func join(s1, s2 string, max int) (string, error) {
-        if s1 == "" {
-                return "", errors.New("s1 is empty")
+    if s1 == "" {
+        return "", errors.New("s1 is empty")
+    } else {
+        if s2 == "" {
+            return "", errors.New("s2 is empty")
         } else {
-                if s2 == "" {
-                        return "", errors.New("s2 is empty")
+            concat, err := concatenate(s1, s2)
+            if err != nil {
+                return "", err
+            } else {
+                if len(concat) > max {
+                    return concat[:max], nil
                 } else {
-                        concat, err := concatenate(s1, s2)
-                        if err != nil {
-                                return "", err
-                        } else {
-                                if len(concat) > max {
-                                        return concat[:max], nil
-                                } else {
-                                        return concat, nil
-                                }
-                        }
+                    return concat, nil
                 }
+            }
         }
+    }
 }
 ```
 
-此函数连接两个字符串，如果长度大于 `max` 则返回一个子字符串。 同时，它处理对 `s1` 、 `s2` 的检查以及对 `concatenate` 的调用是否返回错误。 从实现的角度来看，这个函数是正确的。 然而，建立一个涵盖所有不同案例的核心模型可能不是一项简单的任务。为什么？由于嵌套级别的数量。
+此函数连接两个字符串，如果长度大于 `max` 则返回一个子字符串。同时，它处理对 `s1` 、 `s2` 的检查以及对 `concatenate` 的调用是否返回错误。从实现的角度来看，这个函数是正确的。然而，建立一个涵盖所有不同案例的核心模型可能不是一项简单的任务。为什么？由于嵌套级别的数量。
 
 现在，让我们再次尝试使用相同的功能进行此练习，但实现方式不同：
 
 ```go
 func join(s1, s2 string, max int) (string, error) {
-        if s1 == "" {
-                return "", errors.New("s1 is empty")
-        }
-        if s2 == "" {
-                return "", errors.New("s2 is empty")
-        }
-        concat, err := concatenate(s1, s2)
-        if err != nil {
-                return "", err
-        }
-        if len(concat) > max {
-                return concat[:max], nil
-        }
-        return concat, nil
+    if s1 == "" {
+        return "", errors.New("s1 is empty")
+    }
+    if s2 == "" {
+        return "", errors.New("s2 is empty")
+    }
+    concat, err := concatenate(s1, s2)
+    if err != nil {
+        return "", err
+    }
+    if len(concat) > max {
+        return concat[:max], nil
+    }
+    return concat, nil
 }
 
 func concatenate(s1 string, s2 string) (string, error) {
-        // ...
+    // ...
 }
 ```
 
@@ -68,10 +68,10 @@ func concatenate(s1 string, s2 string) (string, error) {
 
 ```go
 if foo() {
-        // ...
-        return true
+    // ...
+    return true
 } else {
-        // ...
+    // ...
 }
 ```
 
@@ -79,7 +79,7 @@ if foo() {
 
 ```go
 if foo() {
-        return true
+    return true
 }
 // ...
 ```
@@ -90,17 +90,17 @@ if foo() {
 
 ```go
 if s != "" {
-        // ...
+    // ...
 } else {
-        return errors.New("empty string")
+    return errors.New("empty string")
 }
 ```
 
 这里，`s` 为空表示非快乐路径。因此，我们应该像这样翻转条件：
 
 ```go
-if s == "" { #1
-        return errors.New("empty string")
+if s == "" {
+    return errors.New("empty string")
 }
 // ...
 ```
@@ -109,4 +109,4 @@ if s == "" { #1
 
 编写可读的代码对每个开发人员来说都是一项重要的挑战。努力减少嵌套块的数量，对齐左边的快乐路径，尽早返回是提高代码可读性的具体手段。
 
-在下一节中，我们将讨论Go项目中的一个常见误用：init函数。
+在下一节中，我们将讨论Go项目中的一个常见误用：init 函数。

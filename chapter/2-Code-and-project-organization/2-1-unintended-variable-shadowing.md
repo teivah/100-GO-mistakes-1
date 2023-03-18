@@ -5,28 +5,28 @@
 * 高效处理抽象：接口和泛型 
 * 关于如何构建项目的最佳实践
 
-以干净、惯用和可维护的方式组织Go代码库并非易事。理解与代码和项目组织相关的所有最佳实践需要经验和错误。例如，要避免哪些陷阱，例如变量遮蔽和嵌套代码滥用，如何构建包，何时何地使用接口或泛型，init函数，实用程序包？在本章中，我们将深入研究常见的组织错误。
+以干净、惯用和可维护的方式组织 Go 代码库并非易事。理解与代码和项目组织相关的所有最佳实践需要经验和错误。例如，要避免哪些陷阱，例如变量遮蔽和嵌套代码滥用，如何构建包，何时何地使用接口或泛型，init 函数，实用程序包？在本章中，我们将深入研究常见的组织错误。
 
 ## 2.1 意外的阴影变量
 
-变量的范围是指变量可以被引用的地方。换句话说，名称绑定有效的应用程序部分。在Go中，在块中声明的变量名可以在内部块中重新声明。这种称为变量阴影的原理很容易出现常见错误。
+变量的范围是指变量可以被引用的地方。换句话说，名称绑定有效的应用程序部分。在 Go 中，在块中声明的变量名可以在内部块中重新声明。这种称为变量阴影的原理很容易出现常见错误。
 
 在下面的示例中，我们将看到由于阴影变量而产生的意外副作用。我们将以两种不同的方式创建HTTP客户端，具体取决于 `tracing` 布尔值的值：
 
 ```go
 var client *http.Client
 if tracing {
-        client, err := createClientWithTracing()
-        if err != nil {
-                return err
-        }
-        log.Println(client)
+    client, err := createClientWithTracing()
+    if err != nil {
+        return err
+    }
+    log.Println(client)
 } else {
-        client, err := createDefaultClient()
-        if err != nil {
-                return err
-        }
-        log.Println(client)
+    client, err := createDefaultClient()
+    if err != nil {
+        return err
+    }
+    log.Println(client)
 }
 // Use client
 ```
@@ -42,13 +42,13 @@ if tracing {
 ```go
 var client *http.Client
 if tracing {
-        c, err := createClientWithTracing()
-        if err != nil {
-                return err
-        }
-        client = c
+    c, err := createClientWithTracing()
+    if err != nil {
+        return err
+    }
+    client = c
 } else {
-        // Same logic
+    // Same logic
 }
 ```
 
@@ -60,12 +60,12 @@ if tracing {
 var client *http.Client
 var err error
 if tracing {
-        client, err = createClientWithTracing()
-        if err != nil {
-                return err
-        }
+    client, err = createClientWithTracing()
+    if err != nil {
+        return err
+    }
 } else {
-        // Same logic
+    // Same logic
 }
 ```
 
@@ -75,12 +75,12 @@ if tracing {
 
 ```go
 if tracing {
-        client, err = createClientWithTracing()
+    client, err = createClientWithTracing()
 } else {
-        client, err = createDefaultClient()
+    client, err = createDefaultClient()
 }
 if err != nil {
-        // Common error handling
+    // Common error handling
 }
 ```
 
