@@ -9,9 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
     <link rel="stylesheet" href="js/katex.min.css"/>
     <link rel="stylesheet" href="js/vue.css" title="vue"/>
-    <link rel="stylesheet" href="js/dark.css" title="dark" disabled/>
-    <link rel="stylesheet" href="js/buble.css" title="buble" disabled/>
-    <link rel="stylesheet" href="js/pure.css" title="pure" disabled/>
+<!--    <link rel="stylesheet" href="js/dark.css" title="dark" disabled/>-->
+<!--    <link rel="stylesheet" href="js/buble.css" title="buble" disabled/>-->
+<!--    <link rel="stylesheet" href="js/pure.css" title="pure" disabled/>-->
 </head>
 
 <body>
@@ -21,18 +21,9 @@
     window.$docsify = {
         name: '如何避免Go语言的100个错误',
         repo: 'lts8989/go-mistakes',
-        auto2top: true,
-        coverpage: false,
-        executeScript: true,
         loadSidebar: true,
-        loadNavbar: true,
-        mergeNavbar: true,
-        relativePath: true,
-        maxLevel: 4,
         subMaxLevel: 3,
-        alias: {
-            '/.*/_cover.md': '/_navbar.md',
-        },
+        loadNavbar:true,
         search: {
             maxAge: 10000,
             paths: 'auto',
