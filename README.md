@@ -1,5 +1,6 @@
 # 如何避免Go语言的100个错误
 
+
 - 作者：[Teiva Harsanyi](http://teivah.io)
 - 原名：[《100 Go Mistakes and How to Avoid Them》](https://www.manning.com/books/100-go-mistakes-and-how-to-avoid-them)
 - 译者：[李天时](https://github.com/lts8989)
