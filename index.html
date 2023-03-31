@@ -4,14 +4,10 @@
     <meta charset="UTF-8"/>
     <title>如何避免Go语言的100个错误</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <meta name="keywords" content="如何避免Go语言的100个错误"/>
-    <meta name="description" content="A magical documentation generator."/>
+    <meta name="keywords" content="如何避免Go语言的100个错误,Go,100,错误,mistakes,Avoid,书籍,电子书,中文,译文,编程,入门,面试"/>
+    <meta name="description" content="如何避免Go语言的100个错误是100 Go Mistakes and How to Avoid Them的中文译本，本书列举了100个Go语言的常见错误，并给予解答。"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-    <link rel="stylesheet" href="js/katex.min.css"/>
     <link rel="stylesheet" href="js/vue.css" title="vue"/>
-<!--    <link rel="stylesheet" href="js/dark.css" title="dark" disabled/>-->
-<!--    <link rel="stylesheet" href="js/buble.css" title="buble" disabled/>-->
-<!--    <link rel="stylesheet" href="js/pure.css" title="pure" disabled/>-->
 </head>
 
 <body>
@@ -23,17 +19,18 @@
         repo: 'lts8989/go-mistakes',
         loadSidebar: true,
         subMaxLevel: 4,
+        alias: {
+            '/.*/_sidebar.md': '/_sidebar.md',
+        },
         auto2top: true,
         search: {
             maxAge: 10000,
             paths: 'auto',
             noData: '没有结果！',
             placeholder: '搜索',
-            pathNamespaces: ['/en-us']
         }
     };
 </script>
-<script src="js/docsify-katex.js"></script>
 <script src="js/docsify.min.js"></script>
 <script src="js/search.min.js"></script>
 <script src="js/zoom-image.min.js"></script>
