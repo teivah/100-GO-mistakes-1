@@ -22,19 +22,15 @@
         name: '如何避免Go语言的100个错误',
         repo: 'lts8989/go-mistakes',
         loadSidebar: true,
-        subMaxLevel: 3,
-        loadNavbar:true,
+        subMaxLevel: 4,
+        auto2top: true,
+        coverpage: true,
+        // onlyCover: true,
         search: {
             maxAge: 10000,
             paths: 'auto',
-            noData: {
-                '/': '没有结果！',
-                '/en-us/': 'No Results',
-            },
-            placeholder: {
-                '/': '搜索',
-                '/en-us/': 'Search',
-            },
+            noData: '没有结果！',
+            placeholder: '搜索',
             pathNamespaces: ['/en-us']
         }
     };
@@ -42,5 +38,8 @@
 <script src="js/docsify-katex.js"></script>
 <script src="js/docsify.min.js"></script>
 <script src="js/search.min.js"></script>
+<script src="js/zoom-image.min.js"></script>
+<script src="js/prism-bash.min.js"></script>
+<script src="js/prism-go.min.js"></script>
 </body>
 </html>

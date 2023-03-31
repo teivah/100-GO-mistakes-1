@@ -6,7 +6,7 @@
 - 译者：[李天时](https://github.com/lts8989)
 - 校订：[]
 
-> 使用 [Typora](https://www.typora.io)、[Gitbook](https://vonng.gitbook.io/vonng/) 或 [Github Pages](https://lts8989.github.io/) 以获取最佳阅读体验。
+> 使用 [Typora](https://www.typora.io) 或 [Github Pages](https://lts8989.github.io/) 以获取最佳阅读体验。
 >
 > 本地：你可在项目根目录中执行 `make`，并通过浏览器阅读（[在线预览](https://lts8989.github.io/)）。
 
