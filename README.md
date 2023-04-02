@@ -4,7 +4,7 @@
 - 作者：[Teiva Harsanyi](http://teivah.io)
 - 原名：[《100 Go Mistakes and How to Avoid Them》](https://www.manning.com/books/100-go-mistakes-and-how-to-avoid-them)
 - 译者：[李天时](https://github.com/lts8989)
-- 校订：[]
+- 校订：[上杉夏香](https://github.com/ZMbiubiubiu)
 
 > 使用 [Typora](https://www.typora.io) 或 [Github Pages](https://lts8989.github.io/) 以获取最佳阅读体验。
 >
