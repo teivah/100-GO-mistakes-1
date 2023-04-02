@@ -10,10 +10,6 @@
 >
 > 本地：你可在项目根目录中执行 `make`，并通过浏览器阅读（[在线预览](https://lts8989.github.io/)）。
 
-## 译序
-
-## 前言
-
 ## 法律声明
 
 从原作者处得知，已经有简体中文的翻译计划。[购买地址](https://search.jd.com/Search?keyword=go%20100%20mistakes)
