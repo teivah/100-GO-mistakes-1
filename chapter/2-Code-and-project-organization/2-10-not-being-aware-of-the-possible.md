@@ -1,16 +1,16 @@
 ## 2.10 没有意识到类型嵌入可能存在的问题
 
-创建结构时，Go提供了嵌入类型的选项。然而，如果我们不了解类型嵌入的所有影响，这有时可能会导致意想不到的行为。在本节中，让我们提醒我们如何嵌入类型，它带来了什么，以及可能的问题。
+创建结构时，Go 提供了嵌入类型的选项。然而，如果我们不了解类型嵌入的所有影响，这有时可能会导致意想不到的行为。在本节中，让我们提醒我们如何嵌入类型，它带来了什么，以及可能的问题。
 
-在Go中，如果结构字段在没有名称的情况下声明，则称为嵌入式结构字段。例如：
+在 Go 中，如果结构字段在没有名称的情况下声明，则称为嵌入式结构字段。例如：
 
 ```go
 type Foo struct {
-        Bar
+    Bar
 }
 
 type Bar struct {
-        Baz int
+    Baz int
 }
 ```
 
@@ -34,8 +34,8 @@ foo.Baz = 42
 
 ```go
 type ReadWriter interface {
-        Reader
-        Writer
+    Reader
+    Writer
 }
 ```
 
@@ -43,23 +43,23 @@ type ReadWriter interface {
 
 ```go
 type InMem struct {
-        sync.Mutex
-        m map[string]int
+    sync.Mutex
+    m map[string]int
 }
 
 func New() *InMem {
-        return &InMem{m: make(map[string]int)}
+    return &InMem{m: make(map[string]int)}
 }
 ```
 
-我们决定不导出map，以便客户端不能直接与它交互，只能通过导出的方法。同时，互斥场被嵌入。因此，我们可以这样实现 `Get` 方法：
+我们决定不导出 map，以便客户端不能直接与它交互，只能通过导出的方法。同时，互斥场被嵌入。因此，我们可以这样实现 `Get` 方法：
 
 ```go
 func (i *InMem) Get(key string) (int, bool) {
-        i.Lock()
-        v, contains := i.m[key]
-        i.Unlock()
-        return v, contains
+    i.Lock()
+    v, contains := i.m[key]
+    i.Unlock()
+    return v, contains
 }		
 ```
 
@@ -76,8 +76,8 @@ m.Lock() // ??
 
 ```go
 type InMem struct {
-        mu sync.Mutex
-        m map[string]int
+    mu sync.Mutex
+    m map[string]int
 }
 ```
 
@@ -87,42 +87,42 @@ type InMem struct {
 
 ```go
 type Logger struct {
-        writeCloser io.WriteCloser
+    writeCloser io.WriteCloser
 }
 
 func (l Logger) Write(p []byte) (int, error) {
-        return l.writeCloser.Write(p)
+    return l.writeCloser.Write(p)
 }
 
 func (l Logger) Close() error {
-        return l.writeCloser.Close()
+    return l.writeCloser.Close()
 }
 
 func main() {
-        l := Logger{writeCloser: os.Stdout}
-        _, _ = l.Write([]byte("foo"))
-        _ = l.Close()
+    l := Logger{writeCloser: os.Stdout}
+    _, _ = l.Write([]byte("foo"))
+    _ = l.Close()
 }
 ```
 
-`Logger` 必须同时提供 `Write` 和 `Close` 方法，只需将调用转发到 `io.WriteCloser` 。但是，如果该字段现在嵌入，我们可以删除以下转发方法：
+`Logger` 必须同时提供 `Write` 和 `Close` 方法，只需将调用转发到 `io.WriteCloser`。但是，如果该字段现在嵌入，我们可以删除以下转发方法：
 
 ```go
 type Logger struct {
-        io.WriteCloser
+    io.WriteCloser
 }
 
 func main() {
-        l := Logger{WriteCloser: os.Stdout}
-        _, _ = l.Write([]byte("foo"))
-        _ = l.Close()
+    l := Logger{WriteCloser: os.Stdout}
+    _, _ = l.Write([]byte("foo"))
+    _ = l.Close()
 }
 
 ```
 
-client保持不变：两种导出的 `Write` 和 `Close` 方法。然而，它阻止仅仅为了转发调用而实施这些额外的方法。此外，随着 `Write` 和 `Close` 的提升，这意味着 `Logger` 满足 `io.WriteCloser` 接口。
+client 保持不变：两种导出的 `Write` 和 `Close` 方法。然而，它阻止仅仅为了转发调用而实施这些额外的方法。此外，随着 `Write` 和 `Close` 的提升，这意味着 `Logger` 满足 `io.WriteCloser` 接口。
 
-> **Note** 将嵌入与OOP子类化区分开来有时会令人困惑。主要区别在于谁是方法的接收者。
+> **Note** 将嵌入与 OOP 子类化区分开来有时会令人困惑。主要区别在于谁是方法的接收者。
 > 让我们看看下图。左侧表示嵌入在 `Y` 中的 `X` 类型，而在右侧，`Y` 扩展 `X`：
 
 ![](https://img.exciting.net.cn/3.png)

@@ -10,16 +10,16 @@ package main
 import "fmt"
 
 func main() {
-        i := 0
-        if true {
-                i := 1
-                fmt.Println(i)
-        }
+    i := 0
+    if true {
+        i := 1
         fmt.Println(i)
+    }
+    fmt.Println(i)
 }
 ```
 
-`vet` 包含在Go二进制文件旁边，让我们先安装 `shadow` ，将其与Go `vet` 链接，然后在前面的示例上运行它。
+`vet` 包含在Go二进制文件旁边，让我们先安装 `shadow`，将其与 Go `vet` 链接，然后在前面的示例上运行它。
 
 ```shell
 $ go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow

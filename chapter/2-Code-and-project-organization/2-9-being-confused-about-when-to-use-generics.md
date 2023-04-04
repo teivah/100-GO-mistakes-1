@@ -1,6 +1,6 @@
 ## 2.9 令人困惑的泛型
 
-截至Go 1.18，泛型已添加到该语言中。简而言之，它允许编写具有类型代码，这些类型可以稍后指定，并在需要时实例化。然而，很容易对何时使用泛型和何时不使用泛型感到困惑。在本节中，我们将在Go中描述泛型的概念，然后深入研究常见用途和滥用。
+截至 Go 1.18，泛型已添加到该语言中。简而言之，它允许编写具有类型代码，这些类型可以稍后指定，并在需要时实例化。然而，很容易对何时使用泛型和何时不使用泛型感到困惑。在本节中，我们将在 Go 中描述泛型的概念，然后深入研究常见用途和滥用。
 
 ### 2.9.1 概念
 
@@ -16,32 +16,32 @@ func getKeys(m map[string]int) []string {
 }
 ```
 
-如果我们想将类似的功能用于其他 map 类型，例如 `map[int]string`，该怎么办？在泛型之前，Go开发人员有几个选项：使用代码生成、反射或复制代码。
+如果我们想将类似的功能用于其他 map 类型，例如 `map[int]string`，该怎么办？在泛型之前，Go 开发人员有几个选项：使用代码生成、反射或复制代码。
 
 例如，我们可以编写两个函数，每个映射类型一个，甚至尝试扩展 `getKeys` 以接受不同的 map 类型：
 
 ```go
 func getKeys(m any) ([]any, error) {
-        switch t := m.(type) {
-        default:
-                return nil, fmt.Errorf("unknown type: %T", t)
-        case map[string]int:
-                var keys []any
-                for k := range t {
-                        keys = append(keys, k)
-                }
-                return keys, nil
-        case map[int]string:
-                // ...
+    switch t := m.(type) {
+    default:
+        return nil, fmt.Errorf("unknown type: %T", t)
+    case map[string]int:
+        var keys []any
+        for k := range t {
+            keys = append(keys, k)
         }
+        return keys, nil
+    case map[int]string:
+        // ...
+    }
 }
 ```
 
 我们可以开始注意到几个问题：
 
 * 首先，它增加了模版化的代码。事实上，每当我们想添加一种类型时，都需要复制 `range` 循环。
-* 与此同时，函数现在接受 `any` 类型，这意味着我们正在失去Go作为类型化语言的一些优势。实际上，检查类型是否受支持是在运行时而不是编译时进行的。因此，如果提供的类型未知，我们还需要返回错误。
-* 最后，由于 key 类型可以是 `int` 或 `string`，我们有义务返回 `any` 类型的切片来分解 key 类型。这种方法增加了调用侧的工作量，因为client可能还必须对key进行类型检查或进行额外的转换。
+* 与此同时，函数现在接受 `any` 类型，这意味着我们正在失去 Go 作为类型化语言的一些优势。实际上，检查类型是否受支持是在运行时而不是编译时进行的。因此，如果提供的类型未知，我们还需要返回错误。
+* 最后，由于 key 类型可以是 `int` 或 `string`，我们有义务返回 `any` 类型的切片来分解 key 类型。这种方法增加了调用侧的工作量，因为 client 可能还必须对 key 进行类型检查或进行额外的转换。
 
 多亏了泛型，我们现在可以使用类型参数重构此代码。
 
@@ -49,7 +49,7 @@ func getKeys(m any) ([]any, error) {
 
 ```go
 func foo[T any](t T) {
-        // ...
+    // ...
 }
 ```
 
@@ -59,11 +59,11 @@ func foo[T any](t T) {
 
 ```go
 func getKeys[K comparable, V any](m map[K]V) []K {
-        var keys []K
-        for k := range m {
-                keys = append(keys, k)
-        }
-        return keys
+    var keys []K
+    for k := range m {
+        keys = append(keys, k)
+    }
+    return keys
 }
 ```
 
@@ -73,7 +73,7 @@ func getKeys[K comparable, V any](m map[K]V) []K {
 var m map[[]byte]int
 ```
 
-此代码导致编译错误：`invalid map key type []byte`。因此，我们有义务限制类型参数，以便密钥类型满足特定要求，而不是接受任何密钥类型。在这里，具有可比性（我们可以使用 `==` 或 `!=` ）。因此，我们将 `K` 定义为 `comparable` ，而不是 `any`。
+此代码导致编译错误：`invalid map key type []byte`。因此，我们有义务限制类型参数，以便密钥类型满足特定要求，而不是接受任何密钥类型。在这里，具有可比性（我们可以使用 `==` 或 `!=` ）。因此，我们将 `K` 定义为 `comparable`，而不是 `any`。
 
 限制类型参数以匹配特定需求称为约束。约束是一种接口类型，可以包含：
 
@@ -84,11 +84,11 @@ var m map[[]byte]int
 
 ```go
 type customConstraint interface {
-        ~int | ~string
+    ~int | ~string
 }
 
 func getKeys[K customConstraint, V any](m map[K]V) []K {
-        // Same implementation
+    // Same implementation
 }
 ```
 
@@ -117,7 +117,7 @@ keys := getKeys[string](m)
 type customInt int
 
 func (i customInt) String() string {
-        return strconv.Itoa(int(i))
+    return strconv.Itoa(int(i))
 }
 ```
 
@@ -131,8 +131,8 @@ func (i customInt) String() string {
 
 ```go
 type customConstraint interface {
-        ~int
-        String() string
+    ~int
+    String() string
 }
 ```
 
@@ -144,12 +144,12 @@ type customConstraint interface {
 
 ```go
 type Node[T any] struct {
-        Val  T
-        next *Node[T]
+    Val  T
+    next *Node[T]
 }
 
 func (n *Node[T]) Add(next *Node[T]) {
-        n.next = next
+    n.next = next
 }
 ```
 
@@ -179,7 +179,7 @@ func (Foo) bar[T any](t T) {}
 
 ```go
 func merge[T any](ch1, ch2 <-chan T) <-chan T {
-        // ...
+    // ...
 }
 ```
 
@@ -187,9 +187,9 @@ func merge[T any](ch1, ch2 <-chan T) <-chan T {
 
 ```go
 type Interface interface {
-        Len() int
-        Less(i, j int) bool
-        Swap(i, j int)
+    Len() int
+    Less(i, j int) bool
+    Swap(i, j int)
 }
 ```
 
@@ -197,8 +197,8 @@ type Interface interface {
 
 ```go
 type SliceFn[T any] struct {
-        S       []T
-        Compare func(T, T) bool 
+    S       []T
+    Compare func(T, T) bool 
 }
 
 func (s SliceFn[T]) Len() int           { return len(s.S) }
@@ -210,10 +210,10 @@ func (s SliceFn[T]) Swap(i, j int)      { s.S[i], s.S[j] = s.S[j], s.S[i] }
 
 ```go
 s := SliceFn[int]{
-        S: []int{3, 2, 1},
-        Compare: func(a, b int) bool {
-                return a < b
-        },
+    S: []int{3, 2, 1},
+    Compare: func(a, b int) bool {
+            return a < b
+    },
 }
 sort.Sort(s)
 fmt.Println(s.S)
@@ -229,8 +229,8 @@ fmt.Println(s.S)
 
 ```go
 func foo[T io.Writer](w T) {
-        b := getBytes()
-        _, _ = w.Write(b)
+    b := getBytes()
+    _, _ = w.Write(b)
 }
 ```
 

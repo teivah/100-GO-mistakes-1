@@ -20,8 +20,6 @@
 
 本译文只供学习研究参考之用，不得公开传播发行或用于商业用途。有能力阅读英文书籍者请购买正版支持。
 
-[TOC]
-
 - [1 Go:入门容易，掌握难](chapter/1-go-simple-to-learn-but-hard-to-master/1-0-go-simple-to-learn-but-hard-to-master.md)
   - [1.1 Go 大纲](chapter/1-go-simple-to-learn-but-hard-to-master/1-1-go-outline.md)
   - [1.2 简单并不意味着容易](chapter/1-go-simple-to-learn-but-hard-to-master/1-2-simple-doesnt-mean-easy.md)
