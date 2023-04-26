@@ -1,12 +1,11 @@
 # 如何避免Go语言的100个错误
 
-
 - 作者：[Teiva Harsanyi](http://teivah.io)
 - 原名：[《100 Go Mistakes and How to Avoid Them》](https://www.manning.com/books/100-go-mistakes-and-how-to-avoid-them)
 - 译者：[李天时](https://github.com/lts8989)
 - 校订：[上杉夏香](https://github.com/ZMbiubiubiu)
 
-> 使用 [Typora](https://www.typora.io) 或 [Github Pages](https://lts8989.github.io/) 以获取最佳阅读体验。
+> 使用 [Github Pages](https://lts8989.github.io/) 以获取最佳阅读体验。
 >
 > 本地：你可在项目根目录中执行 `make`，并通过浏览器阅读（[在线预览](https://lts8989.github.io/)）。
 
@@ -139,4 +138,4 @@
 
 ## 协议
 
-[CC-BY 4.0](https://github.com/lts8989/go-mistakes/blob/main/LICENSE)
+[CC-BY 4.0](https://github.com/lts8989/lts8989.github.io/blob/main/LICENSE)
