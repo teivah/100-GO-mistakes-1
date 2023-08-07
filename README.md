@@ -139,3 +139,17 @@
 ## 协议
 
 [CC-BY 4.0](https://github.com/lts8989/lts8989.github.io/blob/main/LICENSE)
+
+## 翻译心得
+
+翻译要做到信、达、雅。
+
+举个例子
+
+![](https://img.exciting.net.cn/127.png)
+
+Forever21 是一个美国服装品牌，怎么翻译成中文？
+
+* 信：准确的翻译，永远21。
+* 达：阅读通顺，永远21岁。
+* 雅：接地气，永远18岁。
